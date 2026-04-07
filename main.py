@@ -45,7 +45,8 @@ def scrape_events():
                     context = " ".join(lines[max(0,i-1):i+3])
                     if context not in [e["text"] for e in events]:
                         events.append({"sport": sport.capitalize(), "text": context})
-                    break          if in_today and i > 0:
+                    break          
+                    if in_today and i > 0:
                 is_new_day = any(f"{d} " in lines[i] for d in range(1,32))
                 if is_new_day and TODAY_STR not in lines[i] and len(lines[i]) < 30:
                     break
