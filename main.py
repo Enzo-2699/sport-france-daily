@@ -45,11 +45,14 @@ def scrape_events():
                     context = " ".join(lines[max(0,i-1):i+3])
                     if context not in [e["text"] for e in events]:
                         events.append({"sport": sport.capitalize(), "text": context})
-                    break          
-                    if in_today and i > 0:
-                is_new_day = any(f"{d} " in lines[i] for d in range(1,32))
-                if is_new_day and TODAY_STR not in lines[i] and len(lines[i]) < 30:
                     break
+            if in_today and i > 0:
+                is_new_day = any(f"{d} " in lines[i] for d in range(1, 32))
+                if is_new_day:
+                    if TODAY_STR not in lines[i]:
+                        if len(lines[i]) < 30:
+                            break
+
     return events
 
 def build_html(events):
@@ -65,12 +68,15 @@ def build_html(events):
     else:
         rows = 'Aucun événement trouvé aujourd\'hui — vérifie equipe-france.fr'
 
-    return f"""    
+    return f"""
+    
+      
 
         
-🇫🇷 Les Bleus en compétition aujourd'hui
+Les Bleus en compétition aujourd'hui
 
         
+
 {date_label}
 
 
@@ -82,8 +88,13 @@ def build_html(events):
 
       
 
+
         Source : equipe-france.fr · Généré automatiquement
-        """
+      
+
+
+    
+    """
 
 def send_email(html):
     sender = os.environ["GMAIL_USER"]
@@ -91,7 +102,7 @@ def send_email(html):
     recipient = os.environ.get("RECIPIENT_EMAIL", sender)
 
     msg = MIMEMultipart("alternative")
-    msg["Subject"] = f"🇫🇷 Les Bleus du jour — {TODAY.strftime('%d/%m/%Y')}"
+    msg["Subject"] = f"Les Bleus du jour — {TODAY.strftime('%d/%m/%Y')}"
     msg["From"] = sender
     msg["To"] = recipient
     msg.attach(MIMEText(html, "html"))
